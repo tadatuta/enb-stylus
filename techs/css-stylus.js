@@ -42,6 +42,15 @@ module.exports = require('enb/techs/css').buildFlow()
         var targetName = _this._target;
         var renderer = stylus(css)
             .define('url', function (url) {
+                if (arguments.length > 1) {
+                    // Если url в исходном styl-файле передан без кавычек,
+                    // то он попадает в коллбек не одним параметром,
+                    // а бьется парсером на отдельные айтемы.
+                    url.val = Array.prototype.slice.call(arguments).map(function(a) {
+                        return a.string;
+                    }).join('');
+                }
+
                 return new stylus.nodes.Literal('url(' + _this._resolveCssUrl(url.val, url.filename) + ')');
             });
         if (this._variables) {
